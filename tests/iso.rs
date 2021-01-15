@@ -9,7 +9,7 @@ use petgraph::matrix_graph::MatrixGraph;
 use petgraph::prelude::*;
 use petgraph::EdgeType;
 
-use petgraph::algo::{is_isomorphic, is_isomorphic_matching, is_isomorphic_subgraph};
+use petgraph::algo::{is_isomorphic, is_isomorphic_matching, is_isomorphic_subgraph, isomorphic_subgraph_mapping};
 
 /// Petersen A and B are isomorphic
 ///
@@ -501,6 +501,13 @@ fn iso_subgraph() {
     let g1 = Graph::<(), ()>::from_edges(&[(0, 1), (1, 2), (2, 0), (2, 3)]);
     assert!(!is_isomorphic(&g0, &g1));
     assert!(is_isomorphic_subgraph(&g0, &g1));
+    let map = isomorphic_subgraph_mapping(&g0, &g1).unwrap();
+    assert!(map.len()==3);
+    let mut i = 0;
+    while i < map.len() {
+        assert!(i==map[i]);
+        i = i + 1;
+    }
 }
 
 /// Isomorphic pair
