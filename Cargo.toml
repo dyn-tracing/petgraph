@@ -54,9 +54,6 @@ unstable = ["generate"]
 # feature flags for testing use only
 all = ["unstable", "quickcheck", "matrix_graph", "stable_graph", "graphmap"]
 
-[workspace]
-members = ["serialization-tests"]
-
 [package.metadata.docs.rs]
 features = ["serde-1", "quickcheck"]
 
