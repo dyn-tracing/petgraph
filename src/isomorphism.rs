@@ -754,7 +754,7 @@ where
     self::matching::try_match(&mut st, &mut NoSemanticMatch, &mut NoSemanticMatch).unwrap_or(false)
 }
 
-/// \[Generic\] Return `true` if `g0` is isomorphic to a subgraph of `g1`.
+/// \[Generic\] Return mapping if `g0` is isomorphic to a subgraph of `g1`.
 ///
 /// Using the VF2 algorithm, only matching graph syntactically (graph
 /// structure).
@@ -810,6 +810,43 @@ where
 }
 
 
+/// \[Generic\] Return mapping if `g0` is isomorphic to a subgraph of `g1`.
+///
+/// Using the VF2 algorithm, examining both syntactic and semantic
+/// graph isomorphism (graph structure and matching node and edge weights).
+///
+/// The graphs should not be multigraphs.
+pub fn isomorphic_subgraph_matching<G0, G1, NM, EM>(
+    g0: G0,
+    g1: G1,
+    mut node_match: NM,
+    mut edge_match: EM,
+) -> Option<Vec<usize>>
+where
+    G0: NodeCompactIndexable
+        + EdgeCount
+        + DataMap
+        + GetAdjacencyMatrix
+        + GraphProp
+        + IntoEdgesDirected,
+    G1: NodeCompactIndexable
+        + EdgeCount
+        + DataMap
+        + GetAdjacencyMatrix
+        + GraphProp<EdgeType = G0::EdgeType>
+        + IntoEdgesDirected,
+    NM: FnMut(&G0::NodeWeight, &G1::NodeWeight) -> bool,
+    EM: FnMut(&G0::EdgeWeight, &G1::EdgeWeight) -> bool,
+{
+    if g0.node_count() > g1.node_count() || g0.edge_count() > g1.edge_count() {
+        return None;
+    }
+
+    let mut st = (Vf2State::new(&g0), Vf2State::new(&g1));
+    let ret = self::matching::try_match(&mut st, &mut node_match, &mut edge_match);
+    if ret == None { return None; }
+    Some(st.0.mapping)
+}
 
 
 /// \[Generic\] Return `true` if `g0` is isomorphic to a subgraph of `g1`.
